@@ -1,28 +1,19 @@
 package com.annotion.ruiyi.transparentwindow.service;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
-import android.view.WindowManager;
 
-import com.annotion.ruiyi.transparentwindow.MainActivity;
+import com.annotion.ruiyi.transparentwindow.FloatWindowManager;
 import com.annotion.ruiyi.transparentwindow.MyWindow;
-import com.annotion.ruiyi.transparentwindow.R;
-import com.annotion.ruiyi.transparentwindow.utils.PermissionUtils;
 
 public class TransparentService extends Service {
 
-    private MyWindow myWindow;
     private TransparentService.TransparentReceiver receiver;
 
     public TransparentService() {
@@ -63,8 +54,7 @@ public class TransparentService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.e("--------:", "service-onCreate");
-        Log.e("--------:", "Service进程ID："+android.os.Process.myPid());
-        myWindow = MyWindow.getInstence(this);
+//        myWindow = MyWindow.getInstence(this);
         initRecevice();
 
     }
@@ -92,9 +82,8 @@ public class TransparentService extends Service {
             } else if (Intent.ACTION_USER_PRESENT.equals(action)) {
                 // 解锁
                 Log.i("------", "onReceive: ACTION_USER_PRESENT");
-                if (PermissionUtils.checkFloatPermission(TransparentService.this)){
-                    myWindow.openWindow();
-                }
+                FloatWindowManager.getInstance().applyOrShowFloatWindow(TransparentService.this);
+
             }
         }
     }

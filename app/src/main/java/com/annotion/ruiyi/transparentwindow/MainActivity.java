@@ -1,19 +1,13 @@
 package com.annotion.ruiyi.transparentwindow;
 
-import android.Manifest;
-import android.app.AppOpsManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.Uri;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.annotion.ruiyi.transparentwindow.service.TransparentService;
@@ -24,28 +18,16 @@ public class MainActivity extends AppCompatActivity {
 
     private TransparentService myService = null;
     private ServiceConnection connection;
-    private View view;
-    private WindowManager windowManager;
-    private MyWindow myWindow;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.e("--------:", "MainActivity进程ID："+android.os.Process.myPid());
-//        bindService();
         beginService();
-        myWindow = MyWindow.getInstence(this);
         findViewById(R.id.bt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (PermissionUtils.checkFloatPermission(MainActivity.this)){
-                    myWindow.openWindow();
-                }else {
-                    startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            Uri.parse("package:"+getPackageName())),1);
-                }
+                FloatWindowManager.getInstance().applyOrShowFloatWindow(MainActivity.this);
             }
         });
 
@@ -59,11 +41,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.e("--------:","回调结果:"+resultCode);
-        if (requestCode == 1 && resultCode == RESULT_OK){
-            if (PermissionUtils.checkFloatPermission(MainActivity.this)){
-                myWindow.openWindow();
-            }
-        }
     }
 
     public void bindService(){
@@ -86,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.e("--------:","onStop");
+        Log.e("--------:","---MainActivity---onStop");
         if (PermissionUtils.checkFloatPermission(MainActivity.this)){
             Log.e("--------:","onStop-openWindow");
 //            myService.openWindow(this);
@@ -97,9 +74,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("--------:","onDestroy");
-//        unbindService(connection);
-//        unregisterReceiver(receiver);
+        Log.e("--------:","---MainActivity--onDestroy");
     }
 
     public void showToast(String msg){
